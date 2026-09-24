@@ -26,4 +26,9 @@ const transactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Matches the .find(filter).sort({ date: -1, createdAt: -1 }) pattern used
+// by every transaction/report query — without it, Mongo does a full
+// collection scan and in-memory sort on every request as data grows.
+transactionSchema.index({ date: -1, createdAt: -1 });
+
 module.exports = mongoose.model("Transaction", transactionSchema);

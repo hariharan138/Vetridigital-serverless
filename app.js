@@ -3,6 +3,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 const app = express();
+app.disable("x-powered-by");
 
 const allowedOrigins = [
   process.env.CLIENT_URL || "https://vetridigital.vercel.app",

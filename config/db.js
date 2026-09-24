@@ -28,7 +28,15 @@ async function connectDB() {
 
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(uri, { bufferCommands: false })
+      .connect(uri, {
+        bufferCommands: false,
+        // A serverless function only ever needs a handful of connections at
+        // once (not Mongoose's default pool of 100) — a smaller pool opens
+        // faster on a cold start and avoids piling up idle sockets on Atlas
+        // when many function instances are warm at the same time.
+        maxPoolSize: 5,
+        serverSelectionTimeoutMS: 5000,
+      })
       .then((m) => {
         console.log("MongoDB Connected");
         return m;

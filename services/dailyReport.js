@@ -1,4 +1,3 @@
-const PDFDocument = require("pdfkit");
 const Transaction = require("../models/Transaction");
 
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
@@ -96,6 +95,9 @@ async function buildReportData(now = new Date()) {
 }
 
 function generateReportPdf(data) {
+  // Loaded lazily so every other route's cold start doesn't pay for parsing
+  // pdfkit's font/data files when it's only needed for this one PDF route.
+  const PDFDocument = require("pdfkit");
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: "A4", margin: 40 });
     const chunks = [];
