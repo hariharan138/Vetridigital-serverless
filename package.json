@@ -1,0 +1,30 @@
+{
+  "name": "vetridigital-serverless",
+  "version": "1.0.0",
+  "description": "Vetri Digitals backend — Express app deployed as Vercel serverless functions",
+  "main": "api/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "dev:express": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.2",
+    "nodemailer": "^9.0.3",
+    "pdfkit": "^0.19.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "vercel": "^41.4.1"
+  }
+}
