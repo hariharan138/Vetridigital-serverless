@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { sendDailyReport, sendTelegramReport } = require("../services/dailyReport");
+const { sendDailyReport } = require("../services/dailyReport");
 
 // Replaces the node-cron job from the old always-on server. Vercel Cron Jobs
 // hits this route on a schedule (see vercel.json `crons`). Vercel injects
@@ -15,8 +15,7 @@ router.get("/daily-report", async (req, res) => {
 
   try {
     const email = await sendDailyReport();
-    const telegram = await sendTelegramReport();
-    res.json({ email, telegram });
+    res.json({ email });
   } catch (err) {
     console.error("[cron] daily-report failed:", err);
     res.status(500).json({ message: err.message || "Daily report failed" });

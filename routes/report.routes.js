@@ -1,11 +1,6 @@
 const router = require("express").Router();
 const protect = require("../middleware/auth");
-const {
-  sendDailyReport,
-  sendTelegramReport,
-  buildReportData,
-  generateReportPdf,
-} = require("../services/dailyReport");
+const { sendDailyReport, buildReportData, generateReportPdf } = require("../services/dailyReport");
 
 router.use(protect);
 
@@ -18,18 +13,6 @@ router.post("/send-daily", async (_req, res) => {
   } catch (err) {
     console.error("[daily-report] send failed:", err);
     res.status(500).json({ message: err.message || "Failed to send report" });
-  }
-});
-
-// Manually trigger the Telegram daily summary (for testing / resend)
-router.post("/send-telegram", async (_req, res) => {
-  try {
-    const result = await sendTelegramReport();
-    if (!result.sent) return res.status(400).json({ message: result.reason });
-    res.json({ message: `Telegram report sent to ${result.chatIds.length - result.failed.length} chat(s)` });
-  } catch (err) {
-    console.error("[telegram-report] send failed:", err);
-    res.status(500).json({ message: err.message || "Failed to send Telegram report" });
   }
 });
 
