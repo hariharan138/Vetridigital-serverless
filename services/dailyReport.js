@@ -1,5 +1,4 @@
 const PDFDocument = require("pdfkit");
-const nodemailer = require("nodemailer");
 const Transaction = require("../models/Transaction");
 
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
@@ -225,71 +224,7 @@ function generateReportPdf(data) {
   });
 }
 
-function getTransporter() {
-  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_SERVICE } = process.env;
-  if (!SMTP_USER || !SMTP_PASS) return null;
-  if (SMTP_SERVICE) {
-    return nodemailer.createTransport({
-      service: SMTP_SERVICE,
-      auth: { user: SMTP_USER, pass: SMTP_PASS },
-    });
-  }
-  return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT || 587),
-    secure: Number(SMTP_PORT) === 465,
-    auth: { user: SMTP_USER, pass: SMTP_PASS },
-  });
-}
-
-async function sendDailyReport() {
-  const recipients = (process.env.REPORT_EMAILS || "")
-    .split(",")
-    .map((e) => e.trim())
-    .filter(Boolean);
-
-  if (recipients.length === 0) {
-    console.warn("[daily-report] REPORT_EMAILS not set — skipping report");
-    return { sent: false, reason: "REPORT_EMAILS not configured" };
-  }
-
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.warn("[daily-report] SMTP credentials not set — skipping report");
-    return { sent: false, reason: "SMTP not configured" };
-  }
-
-  const data = await buildReportData();
-  const pdf = await generateReportPdf(data);
-  const net = data.today.income - data.today.expense;
-
-  await transporter.sendMail({
-    from: `"Vetri Digitals Reports" <${process.env.SMTP_USER}>`,
-    to: recipients.join(", "),
-    subject: `Daily Report ${data.dateLabel} — Income ${fmt(data.today.income)}, Expense ${fmt(data.today.expense)}`,
-    text: [
-      `Daily business report for ${data.dateLabel}`,
-      ``,
-      `Today: income ${fmt(data.today.income)}, expense ${fmt(data.today.expense)}, net ${fmt(net)}`,
-      `Open pending orders: ${data.overall.openOrders} (receivables ${fmt(data.overall.pendingReceivables)})`,
-      ``,
-      `Full details are in the attached PDF.`,
-    ].join("\n"),
-    attachments: [
-      {
-        filename: `vetri-daily-report-${data.dateLabel.replace(/ /g, "-")}.pdf`,
-        content: pdf,
-        contentType: "application/pdf",
-      },
-    ],
-  });
-
-  console.log(`[daily-report] Sent to ${recipients.join(", ")}`);
-  return { sent: true, recipients };
-}
-
 module.exports = {
-  sendDailyReport,
   buildReportData,
   generateReportPdf,
   istMonthStart,

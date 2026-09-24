@@ -53,7 +53,6 @@ app.use("/api/notebook", require("./routes/notebook.routes"));
 app.use("/api/payroll", require("./routes/payroll.routes"));
 app.use("/api/cash-overview", require("./routes/cashOverview.routes"));
 
-app.use("/api/cron", require("./routes/cron.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
 
 module.exports = app;
